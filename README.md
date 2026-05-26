@@ -12,8 +12,8 @@ Dois templates para Google Tag Manager que simplificam a instalação do TrackAP
 ## Instalação manual (sem galeria)
 
 1. No GTM, vá em **Modelos → Novo → ⋮ → Importar**
-2. Importe `trackapi-tag.tpl` → salve como **"TrackAPI Analytics"**
-3. Importe `trackapi-event-id.tpl` → salve como **"TrackAPI - Event ID"**
+2. Importe `template.tpl` → salve como **"TrackAPI Analytics"**
+3. Importe o `template.tpl` do repo `trackapi-event-id` → salve como **"TrackAPI - Event ID"**
 
 ## Setup
 
@@ -39,8 +39,11 @@ GTM carrega
 Meta Events Manager: event_id idêntico nos dois canais → 1 conversão contabilizada ✅
 ```
 
-## Publicação na galeria GTM (pendente)
+## GTM Community Gallery
 
-Para submeter à galeria oficial do Google Tag Manager Community Templates:
-1. Criar repositório público no GitHub com os arquivos `.tpl`
-2. Submeter em: https://github.com/google/tagmanager-templates
+Este template está disponível na [Galeria de Templates do GTM](https://tagmanager.google.com/gallery/).
+
+Para submeter uma atualização:
+1. Atualize `template.tpl` e faça commit
+2. Adicione o SHA do novo commit em `metadata.yaml` na seção `versions`
+3. Faça push para o GitHub — atualizações aparecem na galeria em 2–3 dias
