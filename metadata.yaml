@@ -1,6 +1,8 @@
 homepage: "https://trackapi.app.br"
 documentation: "https://trackapi.app.br/docs/sdk"
 versions:
+  - sha: 4d224e1d6fe64f2a547a8c82d8158d1f4994b294
+    changeNotes: GTM export with TOS accepted for gallery submission.
   - sha: fbfe945e1954fb4c09e52ae092b2849a40d8fb8c
     changeNotes: Add tests. Fix README.
   - sha: 618e6b316d26330b8f340128653e26fd8af7f4e1
