@@ -222,54 +222,54 @@ ___WEB_PERMISSIONS___
 ___TESTS___
 
 scenarios:
-  - name: 'calls gtmOnFailure when projectId is empty'
-    code: |-
-      mock('logToConsole', function() {});
-      mock('copyFromWindow', function() { return undefined; });
-      mock('setInWindow', function() {});
-      mock('queryPermission', function() { return true; });
-      mock('injectScript', function() {});
-      let onFailureCalled = false;
-      runCode({
-        projectId: '',
-        endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
-        enableDebug: false,
-        gtmOnSuccess: function() {},
-        gtmOnFailure: function() { onFailureCalled = true; }
-      });
-      assertThat(onFailureCalled).isTrue();
-  - name: 'injects script with projectId appended to URL'
-    code: |-
-      let injectedUrl = '';
-      mock('injectScript', function(url, onSuccess) { injectedUrl = url; onSuccess(); });
-      mock('copyFromWindow', function() { return undefined; });
-      mock('setInWindow', function() {});
-      mock('queryPermission', function() { return true; });
-      mock('logToConsole', function() {});
-      runCode({
-        projectId: 'proj_test123',
-        endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
-        enableDebug: false,
-        gtmOnSuccess: function() {},
-        gtmOnFailure: function() {}
-      });
-      assertThat(injectedUrl).isEqualTo('https://sdk.trackapi.app.br/v1/sdk.js?pid=proj_test123');
-  - name: 'calls gtmOnFailure when queryPermission returns false'
-    code: |-
-      mock('logToConsole', function() {});
-      mock('copyFromWindow', function() { return undefined; });
-      mock('setInWindow', function() {});
-      mock('queryPermission', function() { return false; });
-      mock('injectScript', function() {});
-      let onFailureCalled = false;
-      runCode({
-        projectId: 'proj_test123',
-        endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
-        enableDebug: false,
-        gtmOnSuccess: function() {},
-        gtmOnFailure: function() { onFailureCalled = true; }
-      });
-      assertThat(onFailureCalled).isTrue();
+- name: calls gtmOnFailure when projectId is empty
+  code: |-
+    mock('logToConsole', function() {});
+    mock('copyFromWindow', function() { return undefined; });
+    mock('setInWindow', function() {});
+    mock('queryPermission', function() { return true; });
+    mock('injectScript', function() {});
+    let onFailureCalled = false;
+    runCode({
+      projectId: '',
+      endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
+      enableDebug: false,
+      gtmOnSuccess: function() {},
+      gtmOnFailure: function() { onFailureCalled = true; }
+    });
+    assertThat(onFailureCalled).isTrue();
+- name: injects script with projectId appended to URL
+  code: |-
+    let injectedUrl = '';
+    mock('injectScript', function(url, onSuccess) { injectedUrl = url; onSuccess(); });
+    mock('copyFromWindow', function() { return undefined; });
+    mock('setInWindow', function() {});
+    mock('queryPermission', function() { return true; });
+    mock('logToConsole', function() {});
+    runCode({
+      projectId: 'proj_test123',
+      endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
+      enableDebug: false,
+      gtmOnSuccess: function() {},
+      gtmOnFailure: function() {}
+    });
+    assertThat(injectedUrl).isEqualTo('https://sdk.trackapi.app.br/v1/sdk.js?pid=proj_test123');
+- name: calls gtmOnFailure when queryPermission returns false
+  code: |-
+    mock('logToConsole', function() {});
+    mock('copyFromWindow', function() { return undefined; });
+    mock('setInWindow', function() {});
+    mock('queryPermission', function() { return false; });
+    mock('injectScript', function() {});
+    let onFailureCalled = false;
+    runCode({
+      projectId: 'proj_test123',
+      endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
+      enableDebug: false,
+      gtmOnSuccess: function() {},
+      gtmOnFailure: function() { onFailureCalled = true; }
+    });
+    assertThat(onFailureCalled).isTrue();
 
 
 ___NOTES___
