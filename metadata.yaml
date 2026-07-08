@@ -1,6 +1,8 @@
 homepage: "https://trackapi.app.br"
 documentation: "https://trackapi.app.br/docs"
 versions:
+  - sha: 9a0efab79a5bf28f6ef83319b9871907a7e8ec1e
+    changeNotes: Fix documentation URL (was 404) and add TrackAPI brand icon.
   - sha: 4d224e1d6fe64f2a547a8c82d8158d1f4994b294
     changeNotes: GTM export with TOS accepted for gallery submission.
   - sha: fbfe945e1954fb4c09e52ae092b2849a40d8fb8c
