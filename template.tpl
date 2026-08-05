@@ -51,7 +51,7 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "Endpoint URL",
     "simpleValueType": true,
     "defaultValue": "https://sdk.trackapi.app.br/v1/sdk.js",
-    "help": "The TrackAPI SDK endpoint. Change only if using a custom domain (CNAME) for first-party tracking."
+    "help": "Full URL to your sdk.js. Use your first-party domain (CNAME) for ad-blocker resistance, e.g. https://analytics.yoursite.com/sdk.js. IMPORTANT: after setting a CNAME here, open Permissions > Inject Scripts and add that same host (e.g. https://analytics.yoursite.com/*) — GTM only injects from explicitly allowed hosts, and wildcards for arbitrary domains are not permitted."
   },
   {
     "type": "CHECKBOX",
@@ -283,10 +283,18 @@ Event Match Quality scores.
 How to use:
 1. Create a new Tag using this template
 2. Enter your Project ID from the TrackAPI dashboard
-3. (Optional) Change the endpoint URL if using a custom domain
+3. Set the Endpoint URL to your sdk.js. For first-party (CNAME) tracking,
+   use https://analytics.yoursite.com/sdk.js AND add that host under
+   Permissions > Inject Scripts (e.g. https://analytics.yoursite.com/*).
+   GTM does not allow a wildcard host for arbitrary domains, so each
+   first-party domain must be added to the permission explicitly.
 4. Set the trigger to All Pages or specific events
 5. Use with the TrackAPI Event ID variable for deduplication
 
-Documentation: https://trackapi.app.br/docs/sdk
+Note: if you already load the SDK from a first-party <script> on the site
+(e.g. via WordPress), you do not need this tag — the SDK's autoPageView
+pushes events to the dataLayer for your GTM pixel tags to consume.
+
+Documentation: https://trackapi.app.br/docs
 
 
