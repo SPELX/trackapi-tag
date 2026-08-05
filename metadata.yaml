@@ -1,6 +1,8 @@
 homepage: "https://trackapi.app.br"
 documentation: "https://trackapi.app.br/docs"
 versions:
+  - sha: a7f482306b6fb42146649baf33a705b9754a1010
+    changeNotes: Clarify CNAME endpoint help text and Inject Scripts permission requirement.
   - sha: 9a0efab79a5bf28f6ef83319b9871907a7e8ec1e
     changeNotes: Fix documentation URL (was 404) and add TrackAPI brand icon.
   - sha: 4d224e1d6fe64f2a547a8c82d8158d1f4994b294
