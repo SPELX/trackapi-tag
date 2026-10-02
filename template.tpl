@@ -50,7 +50,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "endpoint",
     "displayName": "Endpoint URL",
     "simpleValueType": true,
-    "defaultValue": "https://sdk.trackapi.app.br/v1/sdk.js",
+    "defaultValue": "https://api.trackapi.app.br/sdk.js",
     "help": "Full URL to your sdk.js. Use your first-party domain (CNAME) for ad-blocker resistance, e.g. https://analytics.yoursite.com/sdk.js. IMPORTANT: after setting a CNAME here, open Permissions > Inject Scripts and add that same host (e.g. https://analytics.yoursite.com/*) — GTM only injects from explicitly allowed hosts, and wildcards for arbitrary domains are not permitted."
   },
   {
@@ -67,14 +67,14 @@ ___TEMPLATE_PARAMETERS___
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 var injectScript = require('injectScript');
-var setInWindow = require('setInWindow');
-var copyFromWindow = require('copyFromWindow');
+var callInWindow = require('callInWindow');
+var encodeUriComponent = require('encodeUriComponent');
 var logToConsole = require('logToConsole');
 var queryPermission = require('queryPermission');
 var makeString = require('makeString');
 
 var projectId = makeString(data.projectId);
-var endpoint = makeString(data.endpoint || 'https://sdk.trackapi.app.br/v1/sdk.js');
+var endpoint = makeString(data.endpoint || 'https://api.trackapi.app.br/sdk.js');
 var debug = data.enableDebug;
 
 if (!projectId) {
@@ -85,21 +85,17 @@ if (!projectId) {
   return;
 }
 
-var configKey = '_trackapi_config';
-var existing = copyFromWindow(configKey);
+var url = endpoint + '?id=' + encodeUriComponent(projectId);
 
-if (!existing) {
-  var config = {
-    projectId: projectId,
-    debug: debug
-  };
-  setInWindow(configKey, config, true);
-}
-
-var url = endpoint + '?pid=' + projectId;
+// The SDK only starts tracking after init(); re-running it on later firings
+// (e.g. SPA history changes) is safe because init() is idempotent.
+var onLoad = function() {
+  callInWindow('TrackAPI.init', { projectId: projectId, debug: debug === true });
+  data.gtmOnSuccess();
+};
 
 if (queryPermission('inject_script', url)) {
-  injectScript(url, data.gtmOnSuccess, data.gtmOnFailure, 'trackapi-sdk');
+  injectScript(url, onLoad, data.gtmOnFailure, 'trackapi-sdk');
 } else {
   if (debug) {
     logToConsole('TrackAPI: Permission denied for script injection.');
@@ -143,7 +139,7 @@ ___WEB_PERMISSIONS___
             "listItem": [
               {
                 "type": 1,
-                "string": "https://sdk.trackapi.app.br/"
+                "string": "https://api.trackapi.app.br/"
               }
             ]
           }
@@ -190,19 +186,19 @@ ___WEB_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "_trackapi_config"
-                  },
-                  {
-                    "type": 8,
-                    "boolean": true
-                  },
-                  {
-                    "type": 8,
-                    "boolean": true
+                    "string": "TrackAPI.init"
                   },
                   {
                     "type": 8,
                     "boolean": false
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
                   }
                 ]
               }
@@ -225,14 +221,13 @@ scenarios:
 - name: calls gtmOnFailure when projectId is empty
   code: |-
     mock('logToConsole', function() {});
-    mock('copyFromWindow', function() { return undefined; });
-    mock('setInWindow', function() {});
+    mock('callInWindow', function() {});
     mock('queryPermission', function() { return true; });
     mock('injectScript', function() {});
     let onFailureCalled = false;
     runCode({
       projectId: '',
-      endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
+      endpoint: 'https://api.trackapi.app.br/sdk.js',
       enableDebug: false,
       gtmOnSuccess: function() {},
       gtmOnFailure: function() { onFailureCalled = true; }
@@ -242,29 +237,46 @@ scenarios:
   code: |-
     let injectedUrl = '';
     mock('injectScript', function(url, onSuccess) { injectedUrl = url; onSuccess(); });
-    mock('copyFromWindow', function() { return undefined; });
-    mock('setInWindow', function() {});
+    mock('callInWindow', function() {});
     mock('queryPermission', function() { return true; });
     mock('logToConsole', function() {});
     runCode({
       projectId: 'proj_test123',
-      endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
+      endpoint: 'https://api.trackapi.app.br/sdk.js',
       enableDebug: false,
       gtmOnSuccess: function() {},
       gtmOnFailure: function() {}
     });
-    assertThat(injectedUrl).isEqualTo('https://sdk.trackapi.app.br/v1/sdk.js?pid=proj_test123');
+    assertThat(injectedUrl).isEqualTo('https://api.trackapi.app.br/sdk.js?id=proj_test123');
+- name: initializes the SDK with the project after the script loads
+  code: |-
+    let initFn = '';
+    let initCfg = null;
+    let onSuccessCalled = false;
+    mock('injectScript', function(url, onSuccess) { onSuccess(); });
+    mock('callInWindow', function(fn, cfg) { initFn = fn; initCfg = cfg; });
+    mock('queryPermission', function() { return true; });
+    mock('logToConsole', function() {});
+    runCode({
+      projectId: 'proj_test123',
+      endpoint: 'https://api.trackapi.app.br/sdk.js',
+      enableDebug: true,
+      gtmOnSuccess: function() { onSuccessCalled = true; },
+      gtmOnFailure: function() {}
+    });
+    assertThat(initFn).isEqualTo('TrackAPI.init');
+    assertThat(initCfg).isEqualTo({ projectId: 'proj_test123', debug: true });
+    assertThat(onSuccessCalled).isTrue();
 - name: calls gtmOnFailure when queryPermission returns false
   code: |-
     mock('logToConsole', function() {});
-    mock('copyFromWindow', function() { return undefined; });
-    mock('setInWindow', function() {});
+    mock('callInWindow', function() {});
     mock('queryPermission', function() { return false; });
     mock('injectScript', function() {});
     let onFailureCalled = false;
     runCode({
       projectId: 'proj_test123',
-      endpoint: 'https://sdk.trackapi.app.br/v1/sdk.js',
+      endpoint: 'https://api.trackapi.app.br/sdk.js',
       enableDebug: false,
       gtmOnSuccess: function() {},
       gtmOnFailure: function() { onFailureCalled = true; }
